@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aplikasi Antrian Kendaraan Pelabuhan</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* center horizontally */
+      padding: 20px;
+    }
+
+    .app-container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 1200px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      flex: 1 0 auto; /* allow container to grow and push footer down */
+      margin: 0 auto;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 25px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: white;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 10px;
+    }
+
+    .nav-tab {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .nav-tab:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .nav-tab.active {
+      background: white;
+      color: #667eea;
+      font-weight: bold;
+    }
+
+    .content {
+      padding: 40px;
+      flex: 1 0 auto; /* let content expand to fill available space */
+    }
+
+    /* Footer styling */
+    footer {
+      width: 100%;
+      max-width: 1200px;
+      margin: 16px auto 0;
+      padding: 12px 18px;
+      background: rgba(255,255,255,0.12);
+      color: #ffffff;
+      text-align: center;
+      border-radius: 12px;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      backdrop-filter: blur(4px);
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    /* Driver Login Page */
+    .login-container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .page-title {
+      font-size: 28px;
+      color: #333;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .page-subtitle {
+      color: #666;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      color: #333;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102,126,234,0.3);
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+      margin-top: 10px;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    /* Driver Dashboard */
+    .dashboard-container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .queue-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 15px;
+      padding: 30px;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .queue-number {
+      font-size: 80px;
+      font-weight: bold;
+      margin: 20px 0;
+      text-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .queue-label {
+      font-size: 18px;
+      opacity: 0.9;
+    }
+
+    .info-card {
+      background: #f8f9fa;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 15px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      color: #666;
+      font-weight: 600;
+    }
+
+    .info-value {
+      color: #333;
+      font-weight: bold;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .status-waiting {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .status-called {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+
+    .status-checked {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-completed {
+      background: #d1d1d1;
+      color: #383838;
+    }
+
+    /* Officer Dashboard */
+    .officer-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+
+    thead {
+      background: #f8f9fa;
+    }
+
+    th {
+      padding: 15px;
+      text-align: left;
+      font-weight: 600;
+      color: #333;
+      border-bottom: 2px solid #e0e0e0;
+    }
+
+    td {
+      padding: 15px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    tbody tr:hover {
+      background: #f8f9fa;
+    }
+
+    .action-btn {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      margin-right: 5px;
+      transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .btn-call {
+      background: #17a2b8;
+      color: white;
+    }
+
+    .btn-verify {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-complete {
+      background: #6c757d;
+      color: white;
+    }
+
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+      padding: 12px 25px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: white;
+      padding: 20px 25px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      display: none;
+      z-index: 1000;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .notification.show {
+      display: block;
+    }
+
+    .notification.success {
+      border-left: 4px solid #28a745;
+    }
+
+    .notification.error {
+      border-left: 4px solid #dc3545;
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        padding: 20px;
+      }
+
+      .header {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .nav-tabs {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .queue-number {
+        font-size: 60px;
+      }
+
+      .officer-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      table {
+        font-size: 14px;
+      }
+
+      th, td {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="header">
+      <div class="logo">
+        <div class="logo-icon">🚢</div>
+        <span>Aplikasi Antrian Kendaraan Pelabuhan</span>
+      </div>
+      <div class="nav-tabs">
+        <button class="nav-tab active" onclick="App.switchPage('driver-login')">Login Pengemudi</button>
+        <button class="nav-tab" onclick="App.switchPage('driver-dashboard')">Dashboard Pengemudi</button>
+        <button class="nav-tab" onclick="App.switchPage('officer-dashboard')">Panel Petugas</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- Driver Login Page -->
+      <div id="driver-login" class="page active">
+        <div class="login-container">
+          <h1 class="page-title">Pendaftaran Pengemudi</h1>
+          <p class="page-subtitle">Daftarkan kendaraan Anda untuk antrian pelabuhan</p>
+          
+          <form id="driverForm" onsubmit="App.registerDriver(event)">
+            <div class="form-group">
+              <label class="form-label">Nomor Kendaraan</label>
+              <input type="text" class="form-input" id="vehicleNumber" placeholder="mis. B 1234 XY" required>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Nama Pengemudi</label>
+              <input type="text" class="form-input" id="driverName" placeholder="Masukkan nama lengkap" required>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Nomor Telepon</label>
+              <input type="tel" class="form-input" id="phoneNumber" placeholder="mis. 08123456789" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Daftar Antrian</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Driver Dashboard Page -->
+      <div id="driver-dashboard" class="page">
+        <div class="dashboard-container">
+          <h1 class="page-title">Status Antrian Anda</h1>
+          <p class="page-subtitle">Informasi antrian secara real-time</p>
+          
+          <div class="queue-card">
+            <div class="queue-label">Nomor Antrian Anda</div>
+            <div class="queue-number" id="driverQueueNumber">-</div>
+            <div id="queueStatus" style="font-size: 18px; margin-top: 10px;">Silakan mendaftar terlebih dahulu</div>
+          </div>
+          
+          <div class="info-card">
+            <div class="info-row">
+              <span class="info-label">Nama Pengemudi</span>
+              <span class="info-value" id="driverNameDisplay">-</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Nomor Kendaraan</span>
+              <span class="info-value" id="vehicleNumberDisplay">-</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Nomor Telepon</span>
+              <span class="info-value" id="phoneNumberDisplay">-</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Status</span>
+              <span id="statusBadge">-</span>
+            </div>
+          </div>
+          
+          <button class="btn btn-secondary" onclick="App.logoutDriver()">Keluar</button>
+        </div>
+      </div>
+
+      <!-- Officer Dashboard Page -->
+      <div id="officer-dashboard" class="page">
+  <h1 class="page-title">Panel Kendali Petugas</h1>
+  <p class="page-subtitle">Kelola antrian kendaraan dan verifikasi</p>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-number" id="totalQueues">0</div>
+            <div class="stat-label">Total Antrian</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="waitingQueues">0</div>
+            <div class="stat-label">Menunggu</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="calledQueues">0</div>
+            <div class="stat-label">Dipanggil</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="completedQueues">0</div>
+            <div class="stat-label">Selesai</div>
+          </div>
+        </div>
+        
+        <div class="officer-controls">
+          <h3 style="margin: 0;">Daftar Antrian</h3>
+          <button class="btn btn-danger" onclick="App.clearAllData()">Hapus Semua Data</button>
+        </div>
+        
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>No. Antrian</th>
+                <th>Nama Pengemudi</th>
+                <th>No. Kendaraan</th>
+                <th>Telepon</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="queueTableBody">
+              <tr>
+                <td colspan="6" class="empty-state">
+                  <div class="empty-state-icon">📋</div>
+                  <div>Belum ada kendaraan dalam antrian</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="notification" class="notification"></div>
+<script src="script.js"></script>
+<footer> Dibuat oleh Kelompok 9 <br>Teknik Simulasi & Pemodelan </footer>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
